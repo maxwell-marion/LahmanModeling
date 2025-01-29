@@ -1,0 +1,17 @@
+---
+title: "LahmanModeling"
+output: html_document
+date: "2025-01-29"
+---
+
+```{r, warning=F}
+# Libraries
+library("DBI")
+library("tidyverse")
+library("gt")
+
+# Establishing ODBC connection to 'SQLserveR'
+con <- dbConnect(odbc::odbc(), "SQLserveR")
+```
+
+
