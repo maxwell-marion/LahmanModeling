@@ -9,9 +9,61 @@ date: "2025-01-29"
 library("DBI")
 library("tidyverse")
 library("gt")
+library("caret")
 
 # Establishing ODBC connection to 'SQLserveR'
 con <- dbConnect(odbc::odbc(), "SQLserveR")
 ```
+
+
+```{r}
+# Classification model - Silver slugger prediction
+
+```
+
+
+# SQL Query
+
+
+```{r}
+# Notes: 
+# - Pull - batting, people, awards from 1980 onward
+# - Filter minimum number of At Bats (AB)
+# - Create some variables within query
+# - Add summarized batting stats
+# -
+```
+
+
+# Exploration 
+
+```{r}
+
+```
+
+
+
+# Model Building
+
+
+```{r}
+
+```
+
+
+# Confusion Matrix
+
+```{r}
+
+```
+
+
+
+# Conclusion
+
+```{r}
+
+```
+
 
 
