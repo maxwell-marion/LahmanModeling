@@ -35,6 +35,18 @@ con <- dbConnect(odbc::odbc(), "SQLserveR")
 ```
 
 
+```{sql connection=con, output.var = "batting_awards"}
+SELECT Batting.*,
+       AwardsPlayers.*
+FROM lahman2023..Batting
+LEFT JOIN lahman2023..AwardsPlayers ON (AwardsPlayers.playerID = Batting.playerID AND AwardsPlayers.yearID = Batting.yearID)
+WHERE Batting.yearID >= 1980 
+  AND AwardsPlayers.awardID IS NULL OR AwardsPlayers.awardID = 'Silver Slugger'
+/* NEED TO REMOVE DUPLICATE ROWS, multiple awards show as multiple rows for that year */
+/* also need to condense rows where players were traded (e.g multiple stints = multiple rows for a year) */
+```
+
+
 # Exploration 
 
 ```{r}
