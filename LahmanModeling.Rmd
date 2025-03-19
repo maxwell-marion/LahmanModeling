@@ -42,15 +42,54 @@ FROM lahman2023..Batting
 LEFT JOIN lahman2023..AwardsPlayers ON (AwardsPlayers.playerID = Batting.playerID AND AwardsPlayers.yearID = Batting.yearID)
 WHERE Batting.yearID >= 1980 
   AND AwardsPlayers.awardID IS NULL OR AwardsPlayers.awardID = 'Silver Slugger'
+ORDER BY Batting.yearID
+/* */
+
 /* NEED TO REMOVE DUPLICATE ROWS, multiple awards show as multiple rows for that year */
+/* (NOTE: Accomplished fixing above by filtering specifically for Silver Slugger) */
+
 /* also need to condense rows where players were traded (e.g multiple stints = multiple rows for a year) */
+
 ```
+
+
+```{r}
+# Cleaning
+
+# Removing duplicate rows
+batting_awards <- batting_awards[,-c(25,27,28)]
+
+# Need to change 'SIlver Slugger' to 'Silver Slugger'
+# table(batting_awards$awardID)
+batting_awards$awardID <- str_replace_all(batting_awards$awardID, 'I','i')
+```
+
 
 
 # Exploration 
 
 ```{r}
+#sum(batting_awards$awardID["Silver Slugger"])
+table(batting_awards$awardID)
 
+#806/(55148-(2*806))
+
+#hist(batting_awards$AB)
+
+test <- batting_awards %>% filter(awardID == 'Silver Slugger')
+
+
+
+
+
+# 806 with no AB cutoff
+#test <- batting_awards[batting_awards$AB > 500,]
+#test <- batting_awards[batting_awards$stint <= 1]
+#table(test$stint)
+#test2 <- batting_awards[batting_awards$awardID == "Silver Slugger",]
+#table(test$awardID)
+#hist(test$AB)
+#sum(batting_awards$AB > 400)
 ```
 
 
