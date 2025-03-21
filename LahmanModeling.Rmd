@@ -1,7 +1,6 @@
 ---
 title: "LahmanModeling"
 output: html_document
-date: "2025-01-29"
 ---
 
 ```{r, warning=F}
@@ -43,18 +42,11 @@ LEFT JOIN lahman2023..AwardsPlayers ON (AwardsPlayers.playerID = Batting.playerI
 WHERE Batting.yearID >= 1980 
   AND AwardsPlayers.awardID IS NULL OR AwardsPlayers.awardID = 'Silver Slugger'
 ORDER BY Batting.yearID
-/* */
-
-/* NEED TO REMOVE DUPLICATE ROWS, multiple awards show as multiple rows for that year */
-/* (NOTE: Accomplished fixing above by filtering specifically for Silver Slugger) */
-
-/* also need to condense rows where players were traded (e.g multiple stints = multiple rows for a year) */
-
 ```
 
 
 ```{r}
-# Cleaning
+# Cleaning + Wrangling
 
 # Removing duplicate rows
 batting_awards <- batting_awards[,-c(25,27,28)]
@@ -62,38 +54,50 @@ batting_awards <- batting_awards[,-c(25,27,28)]
 # Need to change 'SIlver Slugger' to 'Silver Slugger'
 # table(batting_awards$awardID)
 batting_awards$awardID <- str_replace_all(batting_awards$awardID, 'I','i')
+
+# Converting 'Sliver Slugger' awardID to 1
+batting_awards$awardID <- str_replace_all(batting_awards$awardID, 'Silver Slugger',"1")
+batting_awards$awardID <- as.numeric(batting_awards$awardID)
+
+# Fixing players with multiple stints having multiple rows by summing numeric columns by playerID/yearID
+# Assigning to our more final dataframe
+df <- batting_awards %>% group_by(playerID,yearID) %>% summarize(across("G":"awardID", ~ sum(.x, na.rm = TRUE))) %>% ungroup()
 ```
 
+```{r}
+# More data checks
+
+# Checking for outright duplicates
+#sum(duplicated(df))
+
+# Checking for duplicates of playerID AND yearID
+#df %>% group_by(playerID, yearID) %>% filter(row_number(yearID) != 1)
+
+```
 
 
 # Exploration 
 
+
 ```{r}
-#sum(batting_awards$awardID["Silver Slugger"])
-table(batting_awards$awardID)
-
-#806/(55148-(2*806))
-
-#hist(batting_awards$AB)
-
-test <- batting_awards %>% filter(awardID == 'Silver Slugger')
+# Quickly checking distribution of AB
+hist(df$AB)
+```
 
 
+```{r}
+# Creating a table of the number of retained observations for each AB cutoff
+cutoff <- c(100,200,300,400,500)
+n_obs <- c(nrow(df[df$AB > 100,]),nrow(df[df$AB > 200,]),nrow(df[df$AB > 300,]),nrow(df[df$AB > 400,]),nrow(df[df$AB > 500,]))
+cut_table <- as.data.frame(cbind(cutoff,n_obs))
 
-
-
-# 806 with no AB cutoff
-#test <- batting_awards[batting_awards$AB > 500,]
-#test <- batting_awards[batting_awards$stint <= 1]
-#table(test$stint)
-#test2 <- batting_awards[batting_awards$awardID == "Silver Slugger",]
-#table(test$awardID)
-#hist(test$AB)
-#sum(batting_awards$AB > 400)
+print(cut_table, row.names = FALSE)
 ```
 
 
 
+
+ 
 # Model Building
 
 
