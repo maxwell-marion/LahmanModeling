@@ -59,10 +59,19 @@ batting_awards$awardID <- str_replace_all(batting_awards$awardID, 'I','i')
 batting_awards$awardID <- str_replace_all(batting_awards$awardID, 'Silver Slugger',"1")
 batting_awards$awardID <- as.numeric(batting_awards$awardID)
 
+# Removing pitchers for many reasons
+batting_awards <- batting_awards %>% filter((!batting_awards$notes %in% ("P")))
+
 # Fixing players with multiple stints having multiple rows by summing numeric columns by playerID/yearID
 # Assigning to our more final dataframe
 df <- batting_awards %>% group_by(playerID,yearID) %>% summarize(across("G":"awardID", ~ sum(.x, na.rm = TRUE))) %>% ungroup()
 ```
+
+```{r}
+#batting_awards %>% filter(batting_awards$notes != "P")
+```
+
+
 
 ```{r}
 # More data checks
@@ -87,13 +96,19 @@ hist(df$AB)
 
 ```{r}
 # Creating a table of the number of retained observations for each AB cutoff
-cutoff <- c(100,200,300,400,500)
-n_obs <- c(nrow(df[df$AB > 100,]),nrow(df[df$AB > 200,]),nrow(df[df$AB > 300,]),nrow(df[df$AB > 400,]),nrow(df[df$AB > 500,]))
-cut_table <- as.data.frame(cbind(cutoff,n_obs))
+cutoff <- c(100,200,300,400,500,600)
+n_obs <- c(nrow(df[df$AB > 100,]),nrow(df[df$AB > 200,]),nrow(df[df$AB > 300,]),nrow(df[df$AB > 400,]),nrow(df[df$AB > 500,]),nrow(df[df$AB > 600,]))
+n_ss <- c(nrow(df[df$AB > 100 & df$awardID > 0,]),nrow(df[df$AB > 200 & df$awardID > 0,]),nrow(df[df$AB > 300 & df$awardID > 0,]),nrow(df[df$AB > 400 & df$awardID > 0,]),nrow(df[df$AB > 500 & df$awardID > 0,]),nrow(df[df$AB > 600 & df$awardID > 0,]))
+cut_table <- as.data.frame(cbind(cutoff,n_obs, n_ss))
+cut_table <- cut_table %>% mutate(ss_ratio = round((n_ss/n_obs),2), ss_perc = n_ss/(nrow(df[df$awardID > 0,])))
 
 print(cut_table, row.names = FALSE)
 ```
 
+
+```{r}
+df %>% group_by(playerID,yearID) %>% filter(awardID >= 1 & AB < 200)
+```
 
 
 
