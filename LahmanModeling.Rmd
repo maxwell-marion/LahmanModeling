@@ -106,9 +106,36 @@ print(cut_table, row.names = FALSE)
 ```
 
 
+(TALK ABOUT 2020 SEASON - 1994/1995 shortened seasons)
+
+
 ```{r}
 df %>% group_by(playerID,yearID) %>% filter(awardID >= 1 & AB < 200)
 ```
+
+```{r}
+df <- df %>% mutate(PA = (AB + BB + HBP + SF + SH))
+#nrow(df)
+#nrow(df[df$PA > 502,])
+
+df[df$PA > 502,] %>% summarize(average = mean(AB))
+
+5152/50655
+```
+
+
+A word about J.D. Martinez (2018)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
